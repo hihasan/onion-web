@@ -26,7 +26,7 @@ export function ProjectCard({ project, issues }: { project: Project; issues: Iss
           {project.key[0]}
         </span>
         <div className="min-w-0">
-          <h3 className="truncate font-semibold group-hover:text-primary">{project.name}</h3>
+          <h3 className="font-heading truncate font-semibold group-hover:text-primary">{project.name}</h3>
           <Badge variant="secondary" className="mt-0.5">
             {project.key}
           </Badge>

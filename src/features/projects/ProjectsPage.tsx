@@ -16,7 +16,7 @@ export function ProjectsPage() {
   return (
     <div className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold">Your projects</h1>
+        <h1 className="font-heading text-2xl font-semibold">Your projects</h1>
         <p className="text-sm text-muted-foreground">Pick a project to open its board.</p>
       </div>
 
