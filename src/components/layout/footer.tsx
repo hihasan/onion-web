@@ -1,14 +1,43 @@
-const WAVE =
-  "M0,8 Q30,5 60,8 T120,8 T180,8 T240,8 T300,8 T360,8 T420,8 T480,8 T540,8 T600,8 T660,8 T720,8 T780,8 T840,8 T900,8 T960,8 T1020,8 T1080,8 T1140,8 T1200,8"
+const VIEWBOX_WIDTH = 1200
+const VIEWBOX_HEIGHT = 40
+const BASELINE = 20
+const AMPLITUDE = 8
+const WAVE_COUNT = 75
+
+function buildWavePath() {
+  const segmentWidth = VIEWBOX_WIDTH / WAVE_COUNT
+  let d = `M0,${BASELINE}`
+  for (let i = 0; i < WAVE_COUNT; i++) {
+    const x = (i + 1) * segmentWidth
+    const controlX = x - segmentWidth / 2
+    const controlY = i % 2 === 0 ? BASELINE - AMPLITUDE : BASELINE + AMPLITUDE
+    d += ` Q${controlX},${controlY} ${x},${BASELINE}`
+  }
+  return d
+}
+
+const WAVE = buildWavePath()
 
 export function Footer() {
   return (
     <footer className="shrink-0">
       {/* Above this curve stays transparent (page background); only the fill
           below it — and everything under the svg — is painted yellow. */}
-      <svg viewBox="0 0 1200 16" preserveAspectRatio="none" className="block h-3 w-full" aria-hidden="true">
-        <path d={`${WAVE} L1200,16 L0,16 Z`} fill="#FFC93C" />
-        <path d={WAVE} fill="none" stroke="black" strokeWidth="2" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+      <svg
+        viewBox={`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
+        preserveAspectRatio="none"
+        className="block h-8 w-full"
+        aria-hidden="true"
+      >
+        <path d={`${WAVE} L${VIEWBOX_WIDTH},${VIEWBOX_HEIGHT} L0,${VIEWBOX_HEIGHT} Z`} fill="#FFC93C" />
+        <path
+          d={WAVE}
+          fill="none"
+          stroke="black"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
+        />
       </svg>
 
       <div className="bg-[#FFC93C] px-4 py-3 text-center">
