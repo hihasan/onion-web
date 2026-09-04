@@ -1,7 +1,19 @@
+<div align="center">
+
+<img src="src/assets/ic_onion.png" alt="onion logo" width="80" />
+
 # onion
 
-A Jira-style project management tool — boards, backlog, sprints, and issue
-detail, built as a design/UI-first project.
+**A Jira-style project management tool — boards, backlog, sprints, and issue detail.**
+
+![Build](https://img.shields.io/badge/Build-Vite-646CFF?logo=vite&logoColor=white)
+![UI](https://img.shields.io/badge/UI-React%2019-149ECA?logo=react&logoColor=white)
+![Language](https://img.shields.io/badge/Language-TypeScript-3178C6?logo=typescript&logoColor=white)
+![License](https://img.shields.io/badge/License-Unlicensed-lightgrey)
+
+</div>
+
+---
 
 > **Status: UI-first, mock data.** Every screen is fully functional and
 > clickable, but all data lives in an in-memory mock layer. There is no
