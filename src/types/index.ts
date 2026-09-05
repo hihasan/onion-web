@@ -23,6 +23,7 @@ export interface Project {
   name: string
   description: string
   leadId: string
+  category: string // e.g. "Software", "Marketing" — a free-form grouping label
   avatarColor: string // tailwind bg-* class for the project's avatar chip
 }
 

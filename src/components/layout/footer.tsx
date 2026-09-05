@@ -22,14 +22,14 @@ export function Footer() {
   return (
     <footer className="shrink-0">
       {/* Above this curve stays transparent (page background); only the fill
-          below it — and everything under the svg — is painted yellow. */}
+          below it — and everything under the svg — is painted black. */}
       <svg
         viewBox={`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
         preserveAspectRatio="none"
         className="block h-8 w-full"
         aria-hidden="true"
       >
-        <path d={`${WAVE} L${VIEWBOX_WIDTH},${VIEWBOX_HEIGHT} L0,${VIEWBOX_HEIGHT} Z`} fill="#FFC93C" />
+        <path d={`${WAVE} L${VIEWBOX_WIDTH},${VIEWBOX_HEIGHT} L0,${VIEWBOX_HEIGHT} Z`} fill="black" />
         <path
           d={WAVE}
           fill="none"
@@ -40,8 +40,8 @@ export function Footer() {
         />
       </svg>
 
-      <div className="bg-[#FFC93C] px-4 py-3 text-center">
-        <p className="text-sm font-semibold text-black">
+      <div className="bg-black px-4 py-3 text-center">
+        <p className="text-sm font-semibold text-white">
           All Rights Reserved &copy;{" "}
           <a
             href="https://hihasan.xyz"

@@ -3,7 +3,7 @@ import type { Status } from "@/types"
 // Every project shares the same four-column workflow for simplicity, but
 // each has its own Status rows (mirrors how a real workflow-per-project
 // scheme would be modeled) so per-project customization is a non-issue later.
-function statusesForProject(projectId: string, prefix: string): Status[] {
+export function statusesForProject(projectId: string, prefix: string): Status[] {
   return [
     { id: `${prefix}-todo`, projectId, name: "To Do", category: "todo", order: 0 },
     {

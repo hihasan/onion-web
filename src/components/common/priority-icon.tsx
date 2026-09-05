@@ -4,10 +4,10 @@ import { cn } from "cn"
 import type { Priority } from "@/types"
 
 const config: Record<Priority, { icon: typeof ArrowUp; className: string; label: string }> = {
-  highest: { icon: ChevronsUp, className: "text-red-600", label: "Highest" },
-  high: { icon: ArrowUp, className: "text-orange-500", label: "High" },
-  medium: { icon: Equal, className: "text-amber-500", label: "Medium" },
-  low: { icon: ArrowDown, className: "text-blue-500", label: "Low" },
+  highest: { icon: ChevronsUp, className: "text-foreground", label: "Highest" },
+  high: { icon: ArrowUp, className: "text-foreground", label: "High" },
+  medium: { icon: Equal, className: "text-foreground/70", label: "Medium" },
+  low: { icon: ArrowDown, className: "text-muted-foreground", label: "Low" },
   lowest: { icon: ChevronsDown, className: "text-muted-foreground", label: "Lowest" },
 }
 
