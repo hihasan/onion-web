@@ -1,4 +1,4 @@
-import type { Issue } from "@/types"
+import type { Issue, IssueType } from "@/types"
 
 import { db, delay } from "./db"
 
@@ -98,4 +98,44 @@ export function moveIssueToSprint(
   order?: number
 ): Promise<Issue> {
   return updateIssue(id, { sprintId, ...(order !== undefined ? { order } : {}) })
+}
+
+/** Creates a new issue from the inline "+ Create" row on the board/backlog. */
+export function createIssue(input: {
+  projectId: string
+  projectKey: string
+  title: string
+  type: IssueType
+  statusId: string
+  reporterId: string
+  sprintId: string | null
+}): Promise<Issue> {
+  const all = db.issues.all()
+  const projectIssues = all.filter((i) => i.projectId === input.projectId)
+  const nextNumber =
+    projectIssues.reduce((max, i) => Math.max(max, Number(i.key.split("-")[1]) || 0), 0) + 1
+  const nextOrder = all.reduce((max, i) => Math.max(max, i.order), 0) + 1
+  const now = new Date().toISOString()
+
+  const newIssue: Issue = {
+    id: `iss-${input.projectId}-${Date.now()}`,
+    key: `${input.projectKey}-${nextNumber}`,
+    projectId: input.projectId,
+    type: input.type,
+    title: input.title,
+    description: "",
+    statusId: input.statusId,
+    priority: "medium",
+    assigneeId: null,
+    reporterId: input.reporterId,
+    labels: [],
+    storyPoints: null,
+    sprintId: input.sprintId,
+    order: nextOrder,
+    createdAt: now,
+    updatedAt: now,
+  }
+
+  db.issues.set([...all, newIssue])
+  return delay(newIssue)
 }

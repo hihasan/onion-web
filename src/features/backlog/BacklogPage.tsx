@@ -13,17 +13,20 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { BacklogRow } from "@/features/backlog/components/backlog-row"
 import {
   useBacklogIssues,
+  useCreateIssue,
   useMoveIssueSprint,
   useReorderBacklog,
   useReorderSprint,
 } from "@/features/backlog/hooks/useBacklogIssues"
+import { InlineCreateIssue } from "@/features/backlog/components/inline-create-issue"
 import { SectionDropList } from "@/features/backlog/components/section-drop-list"
 import { SprintSectionMenu } from "@/features/backlog/components/sprint-section-menu"
 import { computeOrderBetween, useBoardIssues } from "@/features/board/hooks/useBoardIssues"
-import { IssueDetailDialog } from "@/features/issue-detail/IssueDetailDialog"
+import { IssueDetailPanel } from "@/features/issue-detail/IssueDetailPanel"
 import { useIssueDetailRoute } from "@/features/issue-detail/hooks/useIssueDetailRoute"
 import { useIssueFilters } from "@/hooks/useIssueFilters"
 import { useActiveSprint, useStatuses } from "@/hooks/useProjectWorkflow"
+import { useProject } from "@/hooks/useProjects"
 import { useCurrentUser, useUsers } from "@/hooks/useUsers"
 import type { Issue, StatusCategory, User } from "@/types"
 
@@ -61,6 +64,7 @@ function groupByAssignee(issues: Issue[], users: User[]): AssigneeGroup[] {
 
 export function BacklogPage() {
   const { projectId } = useParams<{ projectId: string }>()
+  const { data: project } = useProject(projectId)
   const { data: sprint } = useActiveSprint(projectId)
   const { data: statuses } = useStatuses(projectId)
   const {
@@ -81,7 +85,13 @@ export function BacklogPage() {
   const moveIssueSprint = useMoveIssueSprint(projectId, sprint?.id)
   const reorderSprint = useReorderSprint(projectId, sprint?.id)
   const reorderBacklog = useReorderBacklog(projectId)
+  const createIssue = useCreateIssue(projectId, sprint?.id)
   const { openIssueKey, openIssue, closeIssue } = useIssueDetailRoute()
+
+  const defaultStatusId = useMemo(
+    () => statuses?.find((s) => s.category === "todo")?.id ?? statuses?.[0]?.id,
+    [statuses]
+  )
 
   const [groupBy, setGroupBy] = useState<IssueGroupBy>("none")
   const [sprintCollapsed, setSprintCollapsed] = useState(false)
@@ -144,134 +154,154 @@ export function BacklogPage() {
   const sprintDateRange = sprint ? formatDateRange(sprint.startDate, sprint.endDate) : null
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <IssueToolbar
-        search={filters.search}
-        onSearchChange={filters.setSearch}
-        users={users ?? []}
-        assigneeIds={filters.assigneeIds}
-        onToggleAssignee={filters.toggleAssignee}
-        types={filters.types}
-        onToggleType={filters.toggleType}
-        labels={filters.labels}
-        availableLabels={filters.availableLabels}
-        onToggleLabel={filters.toggleLabel}
-        quickFilters={filters.quickFilters}
-        onToggleQuickFilter={filters.toggleQuickFilter}
-        epics={epics}
-        groupBy={groupBy}
-        onGroupByChange={setGroupBy}
-        onRefresh={() => {
-          refetchSprintIssues()
-          refetchBacklogIssues()
-        }}
-        isRefreshing={isSprintIssuesFetching || isBacklogFetching}
-      />
+    <div className="flex min-h-0 flex-1">
+      <div className="flex min-h-0 flex-1 flex-col">
+        <IssueToolbar
+          search={filters.search}
+          onSearchChange={filters.setSearch}
+          users={users ?? []}
+          assigneeIds={filters.assigneeIds}
+          onToggleAssignee={filters.toggleAssignee}
+          types={filters.types}
+          onToggleType={filters.toggleType}
+          labels={filters.labels}
+          availableLabels={filters.availableLabels}
+          onToggleLabel={filters.toggleLabel}
+          quickFilters={filters.quickFilters}
+          onToggleQuickFilter={filters.toggleQuickFilter}
+          epics={epics}
+          groupBy={groupBy}
+          onGroupByChange={setGroupBy}
+          onRefresh={() => {
+            refetchSprintIssues()
+            refetchBacklogIssues()
+          }}
+          isRefreshing={isSprintIssuesFetching || isBacklogFetching}
+        />
 
-      <ScrollArea className="min-h-0 flex-1">
-        <div className="flex flex-col gap-6 px-6 py-4">
-          {isLoading ? (
-            <div className="flex flex-col gap-2 py-4">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-11 animate-pulse rounded-md bg-muted/40" />
-              ))}
-            </div>
-          ) : (
-            <DndWrapper enabled={groupBy === "none"} sensors={sensors} onDragEnd={handleDragEnd}>
-              {sprint ? (
-                <div className="flex flex-col gap-2">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setSprintCollapsed((v) => !v)}
-                      aria-label={sprintCollapsed ? "Expand sprint" : "Collapse sprint"}
-                      className="text-muted-foreground hover:text-foreground"
-                    >
-                      {sprintCollapsed ? (
-                        <ChevronRight className="size-4" />
-                      ) : (
-                        <ChevronDown className="size-4" />
-                      )}
-                    </button>
-                    <span className="text-sm font-semibold">{sprint.name}</span>
-                    {sprintDateRange ? (
-                      <span className="text-xs text-muted-foreground">{sprintDateRange}</span>
-                    ) : null}
-                    <span className="text-xs text-muted-foreground">
-                      {filteredSprintIssues.length === (sprintIssues?.length ?? 0)
-                        ? `${sprintIssues?.length ?? 0} work items`
-                        : `${filteredSprintIssues.length} of ${sprintIssues?.length ?? 0} work items visible`}
-                    </span>
+        <ScrollArea className="min-h-0 flex-1">
+          <div className="flex flex-col gap-6 px-6 py-4">
+            {isLoading ? (
+              <div className="flex flex-col gap-2 py-4">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="h-11 animate-pulse rounded-md bg-muted/40" />
+                ))}
+              </div>
+            ) : (
+              <DndWrapper enabled={groupBy === "none"} sensors={sensors} onDragEnd={handleDragEnd}>
+                {sprint ? (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setSprintCollapsed((v) => !v)}
+                        aria-label={sprintCollapsed ? "Expand sprint" : "Collapse sprint"}
+                        className="text-muted-foreground hover:text-foreground"
+                      >
+                        {sprintCollapsed ? (
+                          <ChevronRight className="size-4" />
+                        ) : (
+                          <ChevronDown className="size-4" />
+                        )}
+                      </button>
+                      <span className="text-sm font-semibold">{sprint.name}</span>
+                      {sprintDateRange ? (
+                        <span className="text-xs text-muted-foreground">{sprintDateRange}</span>
+                      ) : null}
+                      <span className="text-xs text-muted-foreground">
+                        {filteredSprintIssues.length === (sprintIssues?.length ?? 0)
+                          ? `${sprintIssues?.length ?? 0} work items`
+                          : `${filteredSprintIssues.length} of ${sprintIssues?.length ?? 0} work items visible`}
+                      </span>
 
-                    <div className="ml-auto flex items-center gap-2">
-                      {(["todo", "in_progress", "done"] as const).map((category) =>
-                        pointsByCategory[category] > 0 ? (
-                          <span
-                            key={category}
-                            className={`rounded px-1.5 py-0.5 text-xs font-medium ${POINT_PILL_STYLES[category]}`}
-                          >
-                            {pointsByCategory[category]}
-                          </span>
-                        ) : null
-                      )}
-                      <Button size="sm" className="rounded-full">
-                        Complete sprint
-                      </Button>
-                      <SprintSectionMenu
-                        sprint={sprint}
-                        projectId={projectId}
-                        issues={sprintIssues ?? []}
-                        onReorder={(ids) => reorderSprint.mutate(ids)}
-                      />
+                      <div className="ml-auto flex items-center gap-2">
+                        {(["todo", "in_progress", "done"] as const).map((category) =>
+                          pointsByCategory[category] > 0 ? (
+                            <span
+                              key={category}
+                              className={`rounded px-1.5 py-0.5 text-xs font-medium ${POINT_PILL_STYLES[category]}`}
+                            >
+                              {pointsByCategory[category]}
+                            </span>
+                          ) : null
+                        )}
+                        <Button size="sm" className="rounded-full">
+                          Complete sprint
+                        </Button>
+                        <SprintSectionMenu
+                          sprint={sprint}
+                          projectId={projectId}
+                          issues={sprintIssues ?? []}
+                          onReorder={(ids) => reorderSprint.mutate(ids)}
+                        />
+                      </div>
                     </div>
+
+                    {sprintCollapsed ? null : sprintGroups ? (
+                      <GroupedSection groups={sprintGroups} onOpen={openIssue} onReorder={(ids) => reorderSprint.mutate(ids)} />
+                    ) : (
+                      <>
+                        <SectionDropList
+                          id="sprint"
+                          targetSprintId={sprint.id}
+                          issues={filteredSprintIssues}
+                          onOpen={openIssue}
+                          emptyText="Drag work items here to add them to the sprint."
+                        />
+                        <InlineCreateIssue
+                          targetSprintId={sprint.id}
+                          statusId={defaultStatusId}
+                          projectKey={project?.key}
+                          reporterId={currentUser?.id}
+                          createIssue={createIssue}
+                        />
+                      </>
+                    )}
+                  </div>
+                ) : null}
+
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold">Backlog</span>
+                    <span className="text-xs text-muted-foreground">
+                      {filteredBacklogIssues.length === (backlogIssues?.length ?? 0)
+                        ? `${backlogIssues?.length ?? 0} work items`
+                        : `${filteredBacklogIssues.length} of ${backlogIssues?.length ?? 0} work items visible`}
+                    </span>
                   </div>
 
-                  {sprintCollapsed ? null : sprintGroups ? (
-                    <GroupedSection groups={sprintGroups} onOpen={openIssue} onReorder={(ids) => reorderSprint.mutate(ids)} />
-                  ) : (
-                    <SectionDropList
-                      id="sprint"
-                      targetSprintId={sprint.id}
-                      issues={filteredSprintIssues}
+                  {backlogGroups ? (
+                    <GroupedSection
+                      groups={backlogGroups}
                       onOpen={openIssue}
-                      emptyText="Drag work items here to add them to the sprint."
+                      onReorder={(ids) => reorderBacklog.mutate(ids)}
                     />
+                  ) : (
+                    <>
+                      <SectionDropList
+                        id="backlog"
+                        targetSprintId={null}
+                        issues={filteredBacklogIssues}
+                        onOpen={openIssue}
+                        emptyText="No backlog issues match these filters."
+                      />
+                      <InlineCreateIssue
+                        targetSprintId={null}
+                        statusId={defaultStatusId}
+                        projectKey={project?.key}
+                        reporterId={currentUser?.id}
+                        createIssue={createIssue}
+                      />
+                    </>
                   )}
                 </div>
-              ) : null}
+              </DndWrapper>
+            )}
+          </div>
+        </ScrollArea>
+      </div>
 
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-semibold">Backlog</span>
-                  <span className="text-xs text-muted-foreground">
-                    {filteredBacklogIssues.length === (backlogIssues?.length ?? 0)
-                      ? `${backlogIssues?.length ?? 0} work items`
-                      : `${filteredBacklogIssues.length} of ${backlogIssues?.length ?? 0} work items visible`}
-                  </span>
-                </div>
-
-                {backlogGroups ? (
-                  <GroupedSection
-                    groups={backlogGroups}
-                    onOpen={openIssue}
-                    onReorder={(ids) => reorderBacklog.mutate(ids)}
-                  />
-                ) : (
-                  <SectionDropList
-                    id="backlog"
-                    targetSprintId={null}
-                    issues={filteredBacklogIssues}
-                    onOpen={openIssue}
-                    emptyText="No backlog issues match these filters."
-                  />
-                )}
-              </div>
-            </DndWrapper>
-          )}
-        </div>
-      </ScrollArea>
-
-      <IssueDetailDialog issueKey={openIssueKey} onClose={closeIssue} />
+      {openIssueKey ? <IssueDetailPanel issueKey={openIssueKey} onClose={closeIssue} /> : null}
     </div>
   )
 }

@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import { queryKeys } from "@/lib/queryKeys"
-import { getBacklogIssues, moveIssueToSprint, reorderIssues } from "@/services/issueService"
-import type { Issue } from "@/types"
+import { createIssue, getBacklogIssues, moveIssueToSprint, reorderIssues } from "@/services/issueService"
+import type { Issue, IssueType } from "@/types"
 
 export function useBacklogIssues(projectId: string | undefined) {
   return useQuery({
@@ -110,6 +110,37 @@ export function useMoveIssueSprint(projectId: string | undefined, sprintId: stri
       if (context?.previousBacklog) queryClient.setQueryData(backlogKey, context.previousBacklog)
     },
     onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: boardKey })
+      queryClient.invalidateQueries({ queryKey: backlogKey })
+    },
+  })
+}
+
+/** Creates an issue from the inline "+ Create" row, into either the given sprint or the backlog. */
+export function useCreateIssue(projectId: string | undefined, sprintId: string | undefined) {
+  const queryClient = useQueryClient()
+  const boardKey = queryKeys.issues.board(projectId ?? "", sprintId)
+  const backlogKey = queryKeys.issues.backlog(projectId ?? "")
+
+  return useMutation({
+    mutationFn: (input: {
+      projectKey: string
+      title: string
+      type: IssueType
+      statusId: string
+      reporterId: string
+      targetSprintId: string | null
+    }) =>
+      createIssue({
+        projectId: projectId as string,
+        projectKey: input.projectKey,
+        title: input.title,
+        type: input.type,
+        statusId: input.statusId,
+        reporterId: input.reporterId,
+        sprintId: input.targetSprintId,
+      }),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: boardKey })
       queryClient.invalidateQueries({ queryKey: backlogKey })
     },

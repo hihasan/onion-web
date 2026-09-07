@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom"
 import { AppShell } from "@/components/layout/app-shell"
 import { BacklogPage } from "@/features/backlog/BacklogPage"
 import { BoardPage } from "@/features/board/BoardPage"
+import { IssueDetailPage } from "@/features/issue-detail/IssueDetailPage"
 import { ProjectsPage } from "@/features/projects/ProjectsPage"
 import { ProjectLayout } from "@/routes/ProjectLayout"
 
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
           { path: "backlog", element: <BacklogPage /> },
         ],
       },
+      { path: "projects/:projectId/issues/:issueKey", element: <IssueDetailPage /> },
       { path: "*", element: <Navigate to="/" replace /> },
     ],
   },
