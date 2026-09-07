@@ -92,6 +92,10 @@ export function reorderIssues(orderedIds: string[]): Promise<Issue[]> {
   return delay(updated)
 }
 
-export function moveIssueToSprint(id: string, sprintId: string | null): Promise<Issue> {
-  return updateIssue(id, { sprintId })
+export function moveIssueToSprint(
+  id: string,
+  sprintId: string | null,
+  order?: number
+): Promise<Issue> {
+  return updateIssue(id, { sprintId, ...(order !== undefined ? { order } : {}) })
 }

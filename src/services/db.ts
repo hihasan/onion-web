@@ -9,13 +9,15 @@
 import { comments as seedComments } from "@/mocks/comments"
 import { issues as seedIssues } from "@/mocks/issues"
 import { projects as seedProjects } from "@/mocks/projects"
+import { sprints as seedSprints } from "@/mocks/sprints"
 import { statuses as seedStatuses } from "@/mocks/statuses"
-import type { Comment, Issue, Project, Status } from "@/types"
+import type { Comment, Issue, Project, Sprint, Status } from "@/types"
 
 let issues: Issue[] = seedIssues.map((i) => ({ ...i }))
 let comments: Comment[] = seedComments.map((c) => ({ ...c }))
 let projects: Project[] = seedProjects.map((p) => ({ ...p }))
 let statuses: Status[] = seedStatuses.map((s) => ({ ...s }))
+let sprints: Sprint[] = seedSprints.map((s) => ({ ...s }))
 
 export const db = {
   issues: {
@@ -40,6 +42,12 @@ export const db = {
     all: () => statuses,
     set: (next: Status[]) => {
       statuses = next
+    },
+  },
+  sprints: {
+    all: () => sprints,
+    set: (next: Sprint[]) => {
+      sprints = next
     },
   },
 }

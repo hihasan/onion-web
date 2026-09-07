@@ -9,20 +9,29 @@ export function BoardColumn({
   status,
   issues,
   onOpenIssue,
+  droppableId = status.id,
 }: {
   status: Status
   issues: Issue[]
   onOpenIssue: (key: string) => void
+  /** Overridden when the same status renders in multiple swimlanes, so each drop zone stays unique. */
+  droppableId?: string
 }) {
-  const { setNodeRef, isOver } = useDroppable({ id: status.id, data: { statusId: status.id } })
+  const { setNodeRef, isOver } = useDroppable({
+    id: droppableId,
+    data: { statusId: status.id },
+  })
 
   return (
-    <div className="flex w-72 shrink-0 flex-col rounded-lg bg-muted/40">
-      <div className="flex items-center justify-between px-3 py-2">
-        <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+    <div className="flex min-w-0 flex-1 flex-col rounded-lg bg-muted/40">
+      <div className="flex items-center justify-between gap-2 px-3 py-2">
+        <h3
+          title={status.name}
+          className="truncate text-xs font-semibold tracking-wide text-muted-foreground uppercase"
+        >
           {status.name}
         </h3>
-        <span className="text-xs text-muted-foreground">{issues.length}</span>
+        <span className="shrink-0 text-xs text-muted-foreground">{issues.length}</span>
       </div>
       <div
         ref={setNodeRef}

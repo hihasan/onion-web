@@ -57,9 +57,10 @@ fractional `order` between the two new neighbors (`computeOrderBetween` in
 `useBoardIssues.ts`) rather than reindexing the whole list.
 
 `src/mocks/` holds all seed data as typed TS (not JSON) — users, projects,
-statuses, sprints, issues, comments. Every project shares the same four
-statuses (To Do / In Progress / In Review / Done) but each has its own
-`Status` rows, matching how a real per-project workflow would be modeled.
+statuses, sprints, issues, comments. Every project shares the same six
+statuses (To Do / In Progress / Code Review / Testing / Ready for Production /
+Done) but each has its own `Status` rows, matching how a real per-project
+workflow would be modeled.
 
 ## UI components
 

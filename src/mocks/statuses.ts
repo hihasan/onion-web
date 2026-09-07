@@ -1,6 +1,6 @@
 import type { Status } from "@/types"
 
-// Every project shares the same four-column workflow for simplicity, but
+// Every project shares the same six-column workflow for simplicity, but
 // each has its own Status rows (mirrors how a real workflow-per-project
 // scheme would be modeled) so per-project customization is a non-issue later.
 export function statusesForProject(projectId: string, prefix: string): Status[] {
@@ -14,13 +14,27 @@ export function statusesForProject(projectId: string, prefix: string): Status[] 
       order: 1,
     },
     {
-      id: `${prefix}-in-review`,
+      id: `${prefix}-code-review`,
       projectId,
-      name: "In Review",
+      name: "Code Review",
       category: "in_progress",
       order: 2,
     },
-    { id: `${prefix}-done`, projectId, name: "Done", category: "done", order: 3 },
+    {
+      id: `${prefix}-testing`,
+      projectId,
+      name: "Testing",
+      category: "in_progress",
+      order: 3,
+    },
+    {
+      id: `${prefix}-ready-for-production`,
+      projectId,
+      name: "Ready for Production",
+      category: "in_progress",
+      order: 4,
+    },
+    { id: `${prefix}-done`, projectId, name: "Done", category: "done", order: 5 },
   ]
 }
 

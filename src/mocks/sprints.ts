@@ -38,11 +38,3 @@ export const sprints: Sprint[] = [
     state: "active",
   },
 ]
-
-export function getSprintsByProject(projectId: string): Sprint[] {
-  return sprints.filter((s) => s.projectId === projectId)
-}
-
-export function getActiveSprint(projectId: string): Sprint | undefined {
-  return sprints.find((s) => s.projectId === projectId && s.state === "active")
-}

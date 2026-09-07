@@ -13,6 +13,7 @@ import { cn } from "cn"
 export function BacklogRow({ issue, onOpen }: { issue: Issue; onOpen: (key: string) => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: issue.id,
+    data: { issue },
   })
 
   const assignee = getUserById(issue.assigneeId)

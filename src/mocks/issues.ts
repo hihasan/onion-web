@@ -61,7 +61,7 @@ export const issues: Issue[] = [
     title: "Drag issue cards between columns",
     description:
       "Dragging a card to a new column should update its status optimistically and persist via issueService.updateIssueStatus.",
-    statusId: "oni-in-review",
+    statusId: "oni-code-review",
     priority: "high",
     assigneeId: "user-2",
     reporterId: "user-1",
@@ -250,7 +250,7 @@ export const issues: Issue[] = [
     type: "bug",
     title: "Blog RSS feed 404s on Safari",
     description: "The /blog/rss.xml link returns 404 when requested from Safari's reader mode.",
-    statusId: "web-in-review",
+    statusId: "web-code-review",
     priority: "medium",
     assigneeId: "user-2",
     reporterId: "user-4",

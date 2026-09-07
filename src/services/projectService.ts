@@ -1,5 +1,4 @@
 import { PROJECT_AVATAR_COLORS } from "@/mocks/projects"
-import { getActiveSprint, getSprintsByProject } from "@/mocks/sprints"
 import { statusesForProject } from "@/mocks/statuses"
 import type { Project, Sprint, Status } from "@/types"
 
@@ -42,9 +41,39 @@ export function getStatuses(projectId: string): Promise<Status[]> {
 }
 
 export function getSprints(projectId: string): Promise<Sprint[]> {
-  return delay(getSprintsByProject(projectId))
+  const result = db.sprints.all().filter((s) => s.projectId === projectId)
+  return delay(result)
 }
 
 export function getCurrentSprint(projectId: string): Promise<Sprint | undefined> {
-  return delay(getActiveSprint(projectId))
+  const result = db.sprints.all().find((s) => s.projectId === projectId && s.state === "active")
+  return delay(result)
+}
+
+export function updateSprint(id: string, patch: Partial<Omit<Sprint, "id" | "projectId">>): Promise<Sprint> {
+  const all = db.sprints.all()
+  const index = all.findIndex((s) => s.id === id)
+  if (index === -1) return Promise.reject(new Error(`Sprint not found: ${id}`))
+
+  const updated: Sprint = { ...all[index], ...patch }
+  const next = [...all]
+  next[index] = updated
+  db.sprints.set(next)
+  return delay(updated)
+}
+
+/** Deletes a sprint and returns its issues to the backlog. */
+export function deleteSprint(id: string): Promise<void> {
+  db.sprints.set(db.sprints.all().filter((s) => s.id !== id))
+
+  const issues = db.issues.all()
+  db.issues.set(
+    issues.map((issue) =>
+      issue.sprintId === id
+        ? { ...issue, sprintId: null, updatedAt: new Date().toISOString() }
+        : issue
+    )
+  )
+
+  return delay(undefined)
 }
