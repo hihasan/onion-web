@@ -64,7 +64,7 @@ export function CreateProjectDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="top-0 left-0 flex h-screen max-h-screen w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 bg-white p-0 text-black sm:max-w-none"
+        className="flex max-h-[85vh] w-full max-w-lg flex-col gap-0 overflow-hidden rounded-xl border border-black bg-white p-0 text-black"
       >
         <div className="flex h-14 shrink-0 items-center justify-between border-b border-black px-6">
           <DialogTitle className="font-heading text-lg">Create project</DialogTitle>
