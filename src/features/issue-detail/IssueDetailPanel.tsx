@@ -47,7 +47,7 @@ export function IssueDetailPanel({
   if (!issueKey) return null
 
   return (
-    <div className="flex h-full w-full max-w-md shrink-0 flex-col border-l bg-background">
+    <div className="flex h-full w-full max-w-sm shrink-0 flex-col border-l bg-background lg:max-w-md">
       <div className="flex shrink-0 items-center justify-between border-b px-4 py-2.5">
         <span className="text-sm font-medium text-muted-foreground">Work item</span>
         <div className="flex items-center gap-1">

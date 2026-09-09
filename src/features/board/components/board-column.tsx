@@ -23,7 +23,7 @@ export function BoardColumn({
   })
 
   return (
-    <div className="flex min-w-0 flex-1 flex-col rounded-lg bg-muted/40">
+    <div className="flex min-w-60 flex-1 flex-col rounded-lg bg-muted/40">
       <div className="flex items-center justify-between gap-2 px-3 py-2">
         <h3
           title={status.name}

@@ -114,11 +114,11 @@ export function BoardPage() {
         isRefreshing={isFetching}
       />
 
-      <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-4">
+      <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto p-4">
         {isLoading || !statuses ? (
           <div className="flex gap-4">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-64 min-w-0 flex-1 animate-pulse rounded-lg bg-muted/40" />
+              <div key={i} className="h-64 min-w-60 flex-1 animate-pulse rounded-lg bg-muted/40" />
             ))}
           </div>
         ) : (
