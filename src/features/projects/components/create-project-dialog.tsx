@@ -17,8 +17,29 @@ import { Textarea } from "@/components/ui/textarea"
 import { useCreateProject } from "@/hooks/useProjects"
 import { useUsers } from "@/hooks/useUsers"
 import { PROJECT_CATEGORIES } from "@/mocks/projects"
+import { cn } from "cn"
 
 const EMPTY_FORM = { name: "", key: "", description: "", leadId: "", category: "" }
+
+const MAX_DESCRIPTION_WORDS = 2500
+
+/** Jira-style default: uppercase first few letters of the name's first word, e.g. "Customer Portal" -> "CUS". */
+function deriveKeyFromName(name: string): string {
+  const firstWord = name.trim().split(/\s+/)[0] ?? ""
+  return firstWord.replace(/[^a-zA-Z]/g, "").slice(0, 3).toUpperCase()
+}
+
+function countWords(text: string): number {
+  const trimmed = text.trim()
+  return trimmed ? trimmed.split(/\s+/).length : 0
+}
+
+/** Truncates to the first `maxWords` words, keeping each word's trailing whitespace so formatting survives. */
+function limitWords(text: string, maxWords: number): string {
+  const tokens = text.match(/\S+\s*/g) ?? []
+  if (tokens.length <= maxWords) return text
+  return tokens.slice(0, maxWords).join("")
+}
 
 export function CreateProjectDialog({
   open,
@@ -31,12 +52,30 @@ export function CreateProjectDialog({
   const createProject = useCreateProject()
   const navigate = useNavigate()
   const [form, setForm] = useState(EMPTY_FORM)
+  const [keyEdited, setKeyEdited] = useState(false)
 
   const isValid = form.name.trim() && form.key.trim() && form.leadId && form.category
+  const descriptionWordCount = countWords(form.description)
 
   function handleOpenChange(next: boolean) {
-    if (!next) setForm(EMPTY_FORM)
+    if (!next) {
+      setForm(EMPTY_FORM)
+      setKeyEdited(false)
+    }
     onOpenChange(next)
+  }
+
+  function handleNameChange(name: string) {
+    setForm((f) => ({ ...f, name, key: keyEdited ? f.key : deriveKeyFromName(name) }))
+  }
+
+  function handleKeyChange(key: string) {
+    setKeyEdited(true)
+    setForm((f) => ({ ...f, key: key.toUpperCase().slice(0, 5) }))
+  }
+
+  function handleDescriptionChange(description: string) {
+    setForm((f) => ({ ...f, description: limitWords(description, MAX_DESCRIPTION_WORDS) }))
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -90,7 +129,7 @@ export function CreateProjectDialog({
             <Input
               id="project-name"
               value={form.name}
-              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+              onChange={(e) => handleNameChange(e.target.value)}
               placeholder="e.g. Customer Portal"
               className="border-black focus-visible:ring-black/30"
               required
@@ -104,9 +143,7 @@ export function CreateProjectDialog({
             <Input
               id="project-key"
               value={form.key}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, key: e.target.value.toUpperCase().slice(0, 5) }))
-              }
+              onChange={(e) => handleKeyChange(e.target.value)}
               placeholder="e.g. CUS"
               className="border-black uppercase focus-visible:ring-black/30"
               required
@@ -114,13 +151,23 @@ export function CreateProjectDialog({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="project-description" className="text-black">
-              Description
-            </Label>
+            <div className="flex items-baseline justify-between">
+              <Label htmlFor="project-description" className="text-black">
+                Description
+              </Label>
+              <span
+                className={cn(
+                  "text-xs tabular-nums",
+                  descriptionWordCount >= MAX_DESCRIPTION_WORDS ? "text-red-600" : "text-neutral-500"
+                )}
+              >
+                {descriptionWordCount} / {MAX_DESCRIPTION_WORDS} words
+              </span>
+            </div>
             <Textarea
               id="project-description"
               value={form.description}
-              onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+              onChange={(e) => handleDescriptionChange(e.target.value)}
               placeholder="What is this project for?"
               rows={3}
               className="border-black focus-visible:ring-black/30"

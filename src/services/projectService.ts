@@ -25,11 +25,25 @@ export function createProject(input: CreateProjectInput): Promise<Project> {
   const project: Project = {
     id: `proj-${crypto.randomUUID()}`,
     avatarColor: PROJECT_AVATAR_COLORS[allProjects.length % PROJECT_AVATAR_COLORS.length],
+    memberIds: [input.leadId],
+    status: "start_progress",
     ...input,
   }
   db.projects.set([...allProjects, project])
   db.statuses.set([...db.statuses.all(), ...statusesForProject(project.id, project.key.toLowerCase())])
   return delay(project)
+}
+
+export function updateProject(id: string, patch: Partial<Omit<Project, "id">>): Promise<Project> {
+  const all = db.projects.all()
+  const index = all.findIndex((p) => p.id === id)
+  if (index === -1) return Promise.reject(new Error(`Project not found: ${id}`))
+
+  const updated: Project = { ...all[index], ...patch }
+  const next = [...all]
+  next[index] = updated
+  db.projects.set(next)
+  return delay(updated)
 }
 
 export function getStatuses(projectId: string): Promise<Status[]> {

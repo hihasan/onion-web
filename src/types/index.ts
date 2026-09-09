@@ -17,12 +17,16 @@ export interface User {
   initials: string
 }
 
+export type ProjectStatus = "start_progress" | "in_progress" | "done" | "paused"
+
 export interface Project {
   id: string
   key: string // short code used in issue keys, e.g. "ONI"
   name: string
   description: string
   leadId: string
+  memberIds: string[]
+  status: ProjectStatus
   category: string // e.g. "Software", "Marketing" — a free-form grouping label
   avatarColor: string // tailwind bg-* class for the project's avatar chip
 }
